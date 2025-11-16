@@ -25,4 +25,9 @@ class AuthServices
 
         return $user->createAuthToken();
     }
+
+    public function logout(User $user): void
+    {
+        $user->revokeAllTokens();
+    }
 }

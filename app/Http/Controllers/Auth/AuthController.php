@@ -46,8 +46,20 @@ class AuthController extends Controller
         //
     }
 
-    public function logout(Request $request)
+    public function logout()
     {
-        //
+        try {
+            $user = Auth::user();
+            $this->authServices->logout($user);
+            return response()->json([
+                'token' => null,
+                'message' => 'Logout realizado com sucesso'
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'token' => null,
+                'message' => 'Erro ao realizar logout'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }
