@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\DTO\Auth\LoginDTO;
-use App\Exceptions\Auth\LoginException;
+use App\DTO\Auth\{ActivateDTO, LoginDTO, RegisterDTO};
+use App\Exceptions\Auth\{ActivateException, LoginException, RegisterException};
 use App\Http\Controllers\Controller;
-use App\Http\Requests\LoginRequest;
+use App\Http\Requests\{ActivateRequest, LoginRequest, RegisterRequest};
+use App\Http\Resources\Auth\RegisterResource;
 use App\Services\AuthServices;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -41,9 +41,47 @@ class AuthController extends Controller
         }
     }
 
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        //
+        try {
+            $validated = $request->validated();
+            $register = new RegisterDTO($validated['name'], $validated['email'], $validated['password']);
+            $user = $this->authServices->register($register);
+            return response()->json([
+                'user' => new RegisterResource($user),
+                'message' => 'Usuário cadastrado com sucesso, acesse seu e-mail e clique no link de ativação'
+            ], Response::HTTP_CREATED);
+        } catch (RegisterException $e) {
+            return response()->json([
+                'user' => null,
+                'message' => $e->getMessage()
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (\Exception $e) {
+            return response()->json([
+                'user' => null,
+                'message' => 'Erro ao registrar usuário'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function activate(ActivateRequest $request): Response
+    {
+        try {
+            $validated = $request->validated();
+            $activate = new ActivateDTO($validated['token']);
+            $this->authServices->activate($activate);
+            return response()->json([
+                'message' => 'Usuário ativado com sucesso'
+            ], Response::HTTP_OK);
+        } catch (ActivateException $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erro ao ativar usuário'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     public function logout()

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Exceptions\Auth\LoginException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -22,6 +23,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'status',
+        'email_verified_at',
     ];
 
     /**
@@ -60,5 +63,54 @@ class User extends Authenticatable
     public function categories()
     {
         return $this->hasMany(Category::class);
+    }
+
+    public function accountActivations()
+    {
+        return $this->hasMany(AccountActivation::class);
+    }
+
+    /**
+     * Verifica se o usuário está ativo
+     */
+    public function isActive(): bool
+    {
+        return $this->status === 'active';
+    }
+
+    /**
+     * Verifica se o usuário está pendente
+     */
+    public function isPending(): bool
+    {
+        return $this->status === 'pending';
+    }
+
+    /**
+     * Verifica se o usuário está inativo
+     */
+    public function isInactive(): bool
+    {
+        return $this->status === 'inactive';
+    }
+
+    /**
+     * Verifica se o usuário pode fazer login
+     * 
+     * @throws LoginException
+     */
+    public function ensureCanLogin(): void
+    {
+        if ($this->isPending()) {
+            throw new LoginException(
+                'Usuário pendente de aprovação, acesse seu e-mail e clique no link de ativação'
+            );
+        }
+
+        if ($this->isInactive()) {
+            throw new LoginException(
+                'Usuário inativo, contate o suporte'
+            );
+        }
     }
 }
