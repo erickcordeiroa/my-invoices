@@ -105,6 +105,10 @@ class CategoryController extends Controller
             return response()->json(
                 CategoryResource::collection($categories), 
                 Response::HTTP_OK);
+        } catch (CategoryException $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], Response::HTTP_BAD_REQUEST);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage()

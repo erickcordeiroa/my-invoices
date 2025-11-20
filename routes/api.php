@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\WalletController;
 use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -12,11 +13,15 @@ Route::group(['prefix' => 'v1'], function () {
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
     Route::middleware('auth:sanctum')->group(function () {
-        Route::resource('/categories', CategoryController::class)->only(['index', 'show','store', 'update', 'destroy']);
+        /** Categories */
         Route::get('/categories/search', [CategoryController::class, 'search']);
-        
-        //TODO: Add routes for wallets, invoices and user profile
+        Route::resource('/categories', CategoryController::class)->only(['index', 'show','store', 'update', 'destroy']);
 
+        /** Wallets */
+        Route::get('/wallets/search', [WalletController::class, 'search']);
+        Route::resource('/wallets', WalletController::class)->only(['index', 'show','store', 'update', 'destroy']);
+
+        //TODO: Add routes for invoices and user profile
 
         Route::post('/logout', [AuthController::class, 'logout']);
     });

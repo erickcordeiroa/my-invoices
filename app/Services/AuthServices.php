@@ -85,6 +85,13 @@ class AuthServices
         $accountActivation->update([
             'activated_at' => now(),
         ]);
+
+        if (!$user->wallets()->exists()) {
+            $user->wallets()->create([
+                'name' => 'Carteira Principal',
+                'balance' => 0,
+            ]);
+        }
     }
 
     public function forgotPassword(ForgotDTO $forgot): void

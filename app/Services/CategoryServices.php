@@ -30,6 +30,10 @@ class CategoryServices
             ->where('type', $data->type)
             ->get();
         
+        if ($categories->isEmpty()) {
+            throw new CategoryException('Nenhuma categoria encontrada');
+        }
+
         return $categories;
     }
 
