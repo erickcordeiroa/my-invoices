@@ -165,71 +165,120 @@ Sistema de controle financeiro básico de fluxo de caixa com separação por car
   - Validação de entrada
   - Regras de negócio
 
+- ✅ **Documentação OpenAPI/Swagger**
+  - Documentação completa para Categorias
+  - Documentação completa para Carteiras
+  - Documentação completa para Invoices
+  - Geração automática via L5-Swagger
+
 ---
 
 ## 🚧 TODO - O QUE FALTA IMPLEMENTAR
 
-### 💰 Carteiras (Wallets) - Melhorias Futuras
-- [ ] **Cálculo automático de saldo**
-  - [ ] Atualizar saldo baseado em invoices pagas
-  - [ ] Sincronização automática ao pagar/receber invoice
+### 💰 Carteiras (Wallets)
+- ✅ **Cálculo automático de saldo**
+  - ✅ Atualizar saldo baseado em invoices pagas
+  - ✅ Sincronização automática ao pagar/receber invoice
+  - ✅ Método `updateBalanceByInvoice` implementado no `WalletServices`
+  - ✅ Suporte para income (receita) e expense (despesa)
+  - ✅ Lock de transação para evitar race conditions
 
 ### 📄 Faturas/Invoices (Contas a Pagar e Receber)
-- [ ] **Controller** (`InvoiceController`)
-  - [ ] Listagem de invoices (`GET /v1/invoices`)
-  - [ ] Detalhes da invoice (`GET /v1/invoices/{id}`)
-  - [ ] Criação de invoice (`POST /v1/invoices`)
-  - [ ] Atualização de invoice (`PUT /v1/invoices/{id}`)
-  - [ ] Exclusão de invoice (`DELETE /v1/invoices/{id}`)
-  - [ ] Busca de invoices (`GET /v1/invoices/search`)
-  - [ ] Marcar como pago (`POST /v1/invoices/{id}/pay`)
-  - [ ] Marcar como não pago (`POST /v1/invoices/{id}/unpay`)
+- ✅ **Controller** (`InvoiceController`)
+  - ✅ Listagem de invoices (`GET /v1/invoices`)
+    - Paginação com cursor (12 por página)
+    - Filtro por usuário autenticado
+    - Inclusão de relacionamentos (wallet, category)
+  - ✅ Detalhes da invoice (`GET /v1/invoices/{invoice}`)
+    - Validação de propriedade
+    - Inclusão de relacionamentos
+  - ✅ Criação de invoice (`POST /v1/invoices`)
+    - Suporte para invoice única
+    - Suporte para invoice parcelada
+    - Suporte para invoice recorrente (template)
+  - ✅ Atualização de invoice (`PUT /v1/invoices/{invoice}`)
+    - Atualização de invoice única
+    - Atualização de invoice principal com todas as parcelas relacionadas
+    - Recalculo automático de datas de vencimento das parcelas
+    - Validação de propriedade e relacionamentos
+  - ✅ Exclusão de invoice (`DELETE /v1/invoices/{invoice}`)
+    - Deleta invoice única
+    - Deleta invoice principal e todas as parcelas relacionadas
+    - Reversão automática de saldo se invoices estiverem pagas
+    - Transação para garantir consistência
+  - ✅ Busca de invoices (`GET /v1/invoices/search`)
+    - Filtros: tipo, carteira, categoria, status, período (data de/até)
+    - Ordenação por data de vencimento
+  - ✅ Marcar como pago (`POST /v1/invoices/{invoice}/pay`)
+    - Atualização de status e data de pagamento
+    - Atualização automática de saldo da carteira
+    - Suporte para data de pagamento customizada
+  - ✅ Marcar como não pago (`POST /v1/invoices/{invoice}/unpay`)
+    - Reversão de status e data de pagamento
+    - Reversão automática de saldo da carteira
+    - Recalculo de status baseado na data de vencimento
 
-- [ ] **Service** (`InvoiceServices`)
-  - [ ] Lógica de negócio para CRUD
-  - [ ] Validação de propriedade
-  - [ ] Criação de invoice única
-  - [ ] Criação de invoice parcelada (gerar múltiplas invoices relacionadas)
-  - [ ] Criação de invoice mensal (configurar recorrência)
-  - [ ] Atualização de saldo da carteira ao pagar/receber
-  - [ ] Validação de carteira e categoria
+- ✅ **Service** (`InvoiceServices`)
+  - ✅ Lógica de negócio para CRUD
+  - ✅ Validação de propriedade
+  - ✅ Criação de invoice única (`createSingleInvoice`)
+  - ✅ Criação de invoice parcelada (`createInstallmentInvoices`)
+    - Gera todas as parcelas de uma vez
+    - Relacionamento entre parcelas via `invoice_of`
+    - Incremento automático de datas baseado no período
+    - Descrição com número da parcela (ex: "Pagamento (1/3)")
+  - ✅ Criação de invoice recorrente (`createRecurringInvoice`)
+    - Cria template para geração futura (requer Job não implementado)
+  - ✅ Atualização de saldo da carteira ao pagar/receber
+    - Integração com `WalletServices::updateBalanceByInvoice`
+  - ✅ Validação de carteira e categoria
+  - ✅ Cálculo automático de status (unpaid, paid, overdue)
+  - ✅ Atualização em cascata de parcelas
 
-- [ ] **DTOs** (`InvoiceDTO`)
-  - [ ] StoreUpdateInvoiceDTO
-  - [ ] SearchInvoiceDTO
-  - [ ] PayInvoiceDTO
+- ✅ **DTOs** (`InvoiceDTO`)
+  - ✅ StoreUpdateInvoiceDTO
+  - ✅ SearchInvoiceDTO
+  - ✅ PayInvoiceDTO
 
-- [ ] **Requests** (`InvoiceRequest`)
-  - [ ] StoreUpdateInvoiceRequest
-  - [ ] SearchInvoiceRequest
-  - [ ] PayInvoiceRequest
+- ✅ **Requests** (`InvoiceRequest`)
+  - ✅ StoreUpdateInvoiceRequest
+  - ✅ SearchInvoiceRequest
+  - ✅ PayInvoiceRequest
 
-- [ ] **Resource** (`InvoiceResource`)
-  - [ ] Formatação de resposta
-  - [ ] Inclusão de relacionamentos (wallet, category)
+- ✅ **Resource** (`InvoiceResource`)
+  - ✅ Formatação de resposta
+  - ✅ Inclusão de relacionamentos (wallet, category)
 
-- [ ] **Exception** (`InvoiceException`)
-  - [ ] Tratamento de erros específicos
+- ✅ **Exception** (`InvoiceException`)
+  - ✅ Tratamento de erros específicos
+  - ✅ Mensagens claras e contextuais
 
-- [ ] **Rotas** (`routes/api.php`)
-  - [ ] Adicionar rotas de invoices
+- ✅ **Rotas** (`routes/api.php`)
+  - ✅ Rotas de invoices implementadas
+  - ✅ Rotas de busca, pagar e desmarcar como pago
+  - ✅ Route model binding configurado corretamente
 
 ### 🔄 Sistema de Recorrência (Faturas Mensais)
-- [ ] **Job** (`GenerateRecurringInvoicesJob`)
-  - [ ] Verificar invoices com `repeat_when = 'monthly'`
-  - [ ] Gerar novas invoices automaticamente
-  - [ ] Atualizar `enrollments_of` e `enrollments`
-  - [ ] Parar quando atingir o número total de parcelas
+- ⚠️ **Status**: Parcialmente implementado
+  - ✅ Método `createRecurringInvoice` criado no `InvoiceServices`
+  - ✅ Estrutura de dados suporta recorrência (`repeat_when`, `enrollments`, `enrollments_of`)
+  - ❌ **Job** (`GenerateRecurringInvoicesJob`) - **NÃO IMPLEMENTADO**
+    - [ ] Verificar invoices com `repeat_when = 'monthly'`
+    - [ ] Gerar novas invoices automaticamente
+    - [ ] Atualizar `enrollments_of` e `enrollments`
+    - [ ] Parar quando atingir o número total de parcelas
 
-- [ ] **Command** (`php artisan invoices:generate-recurring`)
+- ❌ **Command** (`php artisan invoices:generate-recurring`) - **NÃO IMPLEMENTADO**
   - [ ] Comando para executar geração de invoices recorrentes
   - [ ] Agendar no cron (diário)
 
-- [ ] **Lógica de geração automática**
+- ❌ **Lógica de geração automática** - **NÃO IMPLEMENTADO**
   - [ ] Verificar data de vencimento
   - [ ] Criar nova invoice com data do próximo mês
   - [ ] Manter relacionamento com invoice original (`invoice_of`)
   - [ ] Atualizar contadores de parcelas
+
+**Nota**: O método `createRecurringInvoice` cria apenas um template de invoice recorrente. A geração automática das próximas invoices requer a implementação do Job e Command acima.
 
 ### 📊 Relatórios
 - [ ] **Controller** (`ReportController`)
@@ -348,15 +397,16 @@ Sistema de controle financeiro básico de fluxo de caixa com separação por car
   - [ ] Adicionar rotas de perfil
 
 ### 🔧 Melhorias e Ajustes
-- [ ] **Validações adicionais**
-  - [ ] Validar se carteira pertence ao usuário ao criar invoice
-  - [ ] Validar se categoria pertence ao usuário ao criar invoice
-  - [ ] Validar tipo de categoria (income/expense) com tipo de invoice
-  - [ ] Validar saldo da carteira ao pagar invoice
+- ✅ **Validações adicionais**
+  - ✅ Validar se carteira pertence ao usuário ao criar invoice
+  - ✅ Validar se categoria pertence ao usuário ao criar invoice
+  - ✅ Validar tipo de categoria (income/expense) com tipo de invoice
+  - ⚠️ Validar saldo da carteira ao pagar invoice (não implementado - permite saldo negativo)
 
-- [ ] **Atualização automática de status**
-  - [ ] Marcar invoice como 'overdue' quando passar da data de vencimento
-  - [ ] Job para verificar invoices vencidas diariamente
+- ✅ **Atualização automática de status**
+  - ✅ Marcar invoice como 'overdue' quando passar da data de vencimento
+  - ✅ Cálculo automático de status no método `calculateStatus`
+  - ❌ Job para verificar invoices vencidas diariamente (não implementado)
 
 - [ ] **Soft deletes**
   - [ ] Verificar se todos os modelos estão usando SoftDeletes corretamente
@@ -368,9 +418,11 @@ Sistema de controle financeiro básico de fluxo de caixa com separação por car
   - [ ] Testes de Jobs
   - [ ] Testes de Commands
 
-- [ ] **Documentação da API**
-  - [x] Swagger/OpenAPI (Categorias e Carteiras implementadas)
-  - [ ] Swagger/OpenAPI (Invoices, Relatórios e Perfil)
+- ✅ **Documentação da API**
+  - ✅ Swagger/OpenAPI (Categorias implementadas)
+  - ✅ Swagger/OpenAPI (Carteiras implementadas)
+  - ✅ Swagger/OpenAPI (Invoices implementadas)
+  - [ ] Swagger/OpenAPI (Relatórios e Perfil)
   - [ ] Postman Collection
 
 - [ ] **Performance**
@@ -394,12 +446,31 @@ A tabela `invoices` já possui campos para suportar:
 - **Invoice mensal**: `repeat_when = 'monthly'`, `period = 'monthly'`, `enrollments = N`
 
 ### Fluxo de Criação de Invoice Parcelada
-1. Usuário cria invoice com `enrollments = 3` (exemplo)
-2. Sistema cria 3 invoices relacionadas:
-   - Invoice 1: `invoice_of = null`, `enrollments = 3`, `enrollments_of = 1`
-   - Invoice 2: `invoice_of = 1`, `enrollments = 3`, `enrollments_of = 2`
-   - Invoice 3: `invoice_of = 1`, `enrollments = 3`, `enrollments_of = 3`
-3. Cada invoice tem `due_at` incrementado conforme o período
+1. Usuário cria invoice com `enrollments = 3` e `period = 'monthly'` (exemplo)
+2. Sistema cria 3 invoices relacionadas em uma transação:
+   - Invoice 1: `invoice_of = null`, `enrollments = 3`, `enrollments_of = 1`, `due_at = data_inicial`
+   - Invoice 2: `invoice_of = 1`, `enrollments = 3`, `enrollments_of = 2`, `due_at = data_inicial + 1 mês`
+   - Invoice 3: `invoice_of = 1`, `enrollments = 3`, `enrollments_of = 3`, `due_at = data_inicial + 2 meses`
+3. Cada invoice tem descrição com número da parcela: "Descrição (1/3)", "Descrição (2/3)", etc.
+4. Todas as parcelas são criadas imediatamente (não há geração automática)
+
+### Fluxo de Atualização de Invoice Parcelada
+1. Usuário atualiza invoice principal
+2. Sistema atualiza todas as parcelas relacionadas:
+   - Atualiza wallet_id, category_id, type, amount, currency
+   - Recalcula datas de vencimento baseado no novo `due_at` e período
+   - Atualiza descrições mantendo número da parcela
+   - Recalcula status de cada parcela
+3. Tudo dentro de uma transação para garantir consistência
+
+### Fluxo de Exclusão de Invoice Parcelada
+1. Usuário deleta invoice principal
+2. Sistema busca todas as parcelas relacionadas
+3. Para cada parcela paga, reverte o saldo da carteira
+4. Deleta todas as parcelas
+5. Se a principal estiver paga, reverte o saldo
+6. Deleta a invoice principal
+7. Tudo dentro de uma transação
 
 ### Fluxo de Criação de Invoice Mensal
 1. Usuário cria invoice com `repeat_when = 'monthly'` e `enrollments = 12` (exemplo)
@@ -410,11 +481,14 @@ A tabela `invoices` já possui campos para suportar:
 6. Para quando `enrollments_of = enrollments`
 
 ### Atualização de Saldo da Carteira
+- ✅ **Implementado** no `WalletServices::updateBalanceByInvoice`
 - Ao marcar invoice como paga (`paid_at` preenchido):
-  - Se `type = 'income'`: `wallet.balance += invoice.amount`
-  - Se `type = 'expense'`: `wallet.balance -= invoice.amount`
+  - Se `type = 'income'`: `wallet.balance += invoice.amount` (dinheiro entrando)
+  - Se `type = 'expense'`: `wallet.balance -= invoice.amount` (dinheiro saindo)
 - Ao desmarcar invoice como paga:
-  - Reverter a operação acima
+  - Reverter a operação acima (subtrai para income, adiciona para expense)
+- Utiliza `lockForUpdate()` para evitar race conditions em transações concorrentes
+- Integrado automaticamente nos métodos `pay()` e `unpay()` do `InvoiceServices`
 
 ---
 
@@ -422,9 +496,9 @@ A tabela `invoices` já possui campos para suportar:
 
 ### Fase 1 - Funcionalidades Core
 1. ✅ CRUD de Carteiras (Wallets) - **CONCLUÍDO**
-2. CRUD de Invoices (básico)
-3. Sistema de parcelas
-4. Sistema de recorrência mensal
+2. ✅ CRUD de Invoices (básico) - **CONCLUÍDO**
+3. ✅ Sistema de parcelas - **CONCLUÍDO**
+4. ⚠️ Sistema de recorrência mensal - **PARCIAL** (template criado, Job não implementado)
 
 ### Fase 2 - Relatórios e Exportação
 1. Sistema de relatórios com filtros
@@ -443,5 +517,24 @@ A tabela `invoices` já possui campos para suportar:
 ---
 
 **Última atualização**: 2025-01-16
-**Versão do projeto**: 0.1.0
+**Versão do projeto**: 0.2.0
+
+## 📋 Changelog
+
+### v0.2.0 (2025-01-16)
+- ✅ Implementado CRUD completo de Invoices
+- ✅ Implementado sistema de parcelas (criação, atualização e exclusão em cascata)
+- ✅ Implementado atualização automática de saldo da carteira
+- ✅ Implementado cálculo automático de status (unpaid, paid, overdue)
+- ✅ Implementado busca avançada de invoices com múltiplos filtros
+- ✅ Implementado marcação de invoice como paga/não paga
+- ✅ Corrigido route model binding para rotas de pay/unpay
+- ✅ Documentação OpenAPI completa para Invoices
+- ⚠️ Sistema de recorrência parcial (método criado, Job não implementado)
+
+### v0.1.0 (2025-01-16)
+- ✅ Implementado CRUD de Categorias
+- ✅ Implementado CRUD de Carteiras
+- ✅ Implementado sistema de autenticação completo
+- ✅ Implementado sistema de emails (ativação e recuperação de senha)
 

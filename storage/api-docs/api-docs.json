@@ -1173,17 +1173,17 @@
                 ]
             }
         },
-        "/invoices/{id}/pay": {
+        "/invoices/{invoice}/pay": {
             "post": {
                 "tags": [
                     "Invoices"
                 ],
                 "summary": "Marcar invoice como paga",
                 "description": "Marca uma invoice como paga e atualiza o saldo da carteira",
-                "operationId": "b135261aa5df559fefac3e4e213cee04",
+                "operationId": "baeb30b8e4f2e22b1c42bb85e23ee33e",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "invoice",
                         "in": "path",
                         "description": "ID da invoice",
                         "required": true,
@@ -1256,17 +1256,17 @@
                 ]
             }
         },
-        "/invoices/{id}/unpay": {
+        "/invoices/{invoice}/unpay": {
             "post": {
                 "tags": [
                     "Invoices"
                 ],
                 "summary": "Marcar invoice como não paga",
                 "description": "Marca uma invoice como não paga e reverte o saldo da carteira",
-                "operationId": "6c7265887a6443367d9b4f89240206e1",
+                "operationId": "c5a54b32fafcd1f7b439f1da928f8d42",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "invoice",
                         "in": "path",
                         "description": "ID da invoice",
                         "required": true,
