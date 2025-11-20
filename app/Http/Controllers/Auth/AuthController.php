@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\DTO\Auth\{ActivateDTO, LoginDTO, RegisterDTO};
-use App\Exceptions\Auth\{ActivateException, LoginException, RegisterException};
+use App\DTO\Auth\{ActivateDTO, ForgotDTO, LoginDTO, RegisterDTO, ResetPasswordDTO};
+use App\Exceptions\Auth\{ActivateException, ForgotPasswordException, LoginException, RegisterException, ResetPasswordException};
 use App\Http\Controllers\Controller;
-use App\Http\Requests\{ActivateRequest, LoginRequest, RegisterRequest};
+use App\Http\Requests\{ActivateRequest, ForgotPasswordRequest, LoginRequest, RegisterRequest, ResetPasswordRequest};
 use App\Http\Resources\Auth\RegisterResource;
 use App\Services\AuthServices;
 use Illuminate\Support\Facades\Auth;
@@ -80,6 +80,46 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Erro ao ativar usuário'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function forgotPassword(ForgotPasswordRequest $request): Response
+    {
+        try {
+            $validated = $request->validated();
+            $forgot = new ForgotDTO($validated['email']);
+            $this->authServices->forgotPassword($forgot);
+            return response()->json([
+                'message' => 'E-mail de redefinição de senha enviado com sucesso'
+            ], Response::HTTP_OK);
+        } catch (ForgotPasswordException $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erro ao enviar e-mail de redefinição de senha'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function resetPassword(ResetPasswordRequest $request): Response
+    {
+        try {
+            $validated = $request->validated();
+            $reset = new ResetPasswordDTO($validated['email'], $validated['password'], $validated['token']);
+            $this->authServices->resetPassword($reset);
+            return response()->json([
+                'message' => 'Senha redefinida com sucesso'
+            ], Response::HTTP_OK);
+        } catch (ResetPasswordException $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erro ao redefinir senha'
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
