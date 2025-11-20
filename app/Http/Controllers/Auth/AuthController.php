@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\DTO\Auth\{ActivateDTO, ForgotDTO, LoginDTO, RegisterDTO, ResetPasswordDTO};
 use App\Exceptions\Auth\{ActivateException, ForgotPasswordException, LoginException, RegisterException, ResetPasswordException};
 use App\Http\Controllers\Controller;
-use App\Http\Requests\{ActivateRequest, ForgotPasswordRequest, LoginRequest, RegisterRequest, ResetPasswordRequest};
+use App\Http\Requests\Auth\{ActivateRequest, ForgotPasswordRequest, LoginRequest, RegisterRequest, ResetPasswordRequest};
 use App\Http\Resources\Auth\RegisterResource;
 use App\Services\AuthServices;
 use Illuminate\Support\Facades\Auth;

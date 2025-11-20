@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Auth;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Symfony\Component\HttpFoundation\Response;
 
-class ActivateRequest extends FormRequest
+class ForgotPasswordRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     */
+     */ 
     public function authorize(): bool
     {
         return true;
@@ -25,7 +25,7 @@ class ActivateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'token' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email'],
         ];
     }
 
@@ -36,8 +36,8 @@ class ActivateRequest extends FormRequest
     {
         throw new HttpResponseException(
             response()->json([
-                'message' => 'Token inválido',
-            ], Response::HTTP_UNPROCESSABLE_ENTITY)
+                'message' => 'E-mail inválido ou não encontrado',
+            ], Response::HTTP_BAD_REQUEST)
         );
     }
 }

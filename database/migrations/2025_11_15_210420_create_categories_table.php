@@ -18,6 +18,8 @@ return new class extends Migration
             $table->enum('type', ['income', 'expense'])->default('income');
             $table->timestamps();
             $table->softDeletes();
+
+            $table->index(['user_id', 'name', 'type']);
         });
     }
 

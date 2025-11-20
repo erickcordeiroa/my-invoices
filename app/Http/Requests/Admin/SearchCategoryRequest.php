@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Admin;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Symfony\Component\HttpFoundation\Response;
 
-class ResetPasswordRequest extends FormRequest
+class SearchCategoryRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,20 +25,16 @@ class ResetPasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'email'],
-            'password' => ['required', 'string', 'min:8'],
-            'token' => ['required', 'string'],
+            'name' => ['required', 'string', 'max:255'],
+            'type' => ['required', 'string', 'in:income,expense'],
         ];
     }
 
-    /**
-     * Handle a failed validation attempt.
-     */
     protected function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(
             response()->json([
-                'message' => 'E-mail, senha ou token inválidos',
+                'message' => 'Dados inválidos',
             ], Response::HTTP_BAD_REQUEST)
         );
     }
