@@ -42,4 +42,16 @@ class Invoice extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    protected function casts(): array
+    {
+        return [
+            'due_at' => 'date',
+            'paid_at' => 'date',
+            'enrollments' => 'integer',
+            'enrollments_of' => 'integer',
+            'invoice_of' => 'integer',
+            'amount' => 'integer',
+        ];
+    }
 }

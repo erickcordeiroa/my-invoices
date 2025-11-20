@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('currency')->default('BRL');
             $table->date('due_at');
             $table->date('paid_at')->nullable();
-            $table->string('repeat_when');
+            $table->string('repeat_when')->nullable();
             $table->string('period')->default('monthly');
             $table->integer('enrollments')->nullable();
             $table->integer('enrollments_of')->nullable();
@@ -31,24 +31,6 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            // Índices para otimização de consultas
-            
-            // ===== ÍNDICES PARA RELATÓRIOS (Filtros combinados) =====
-            // Relatório completo: usuário + carteira + categoria + status + data de vencimento
-            $table->index(['user_id', 'wallet_id', 'category_id', 'status', 'due_at'], 'invoices_report_full_index');
-            
-            // Relatório: usuário + carteira + status + data de vencimento
-            $table->index(['user_id', 'wallet_id', 'status', 'due_at'], 'invoices_report_wallet_status_date_index');
-            
-            // Relatório: usuário + categoria + status + data de vencimento
-            $table->index(['user_id', 'category_id', 'status', 'due_at'], 'invoices_report_category_status_date_index');
-            
-            // Relatório: usuário + status + data de vencimento (mais comum)
-            $table->index(['user_id', 'status', 'due_at'], 'invoices_report_status_date_index');
-            
-            // Relatório por data de lançamento: usuário + data de criação + status
-            $table->index(['user_id', 'created_at', 'status'], 'invoices_report_created_status_index');
-            
             // Relatório: usuário + carteira + categoria + status
             $table->index(['user_id', 'wallet_id', 'category_id', 'status'], 'invoices_report_wallet_category_status_index');
             

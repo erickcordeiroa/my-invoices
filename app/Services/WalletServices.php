@@ -5,6 +5,7 @@ namespace App\Services;
 use App\DTO\Admin\SearchWalletDTO;
 use App\DTO\Admin\StoreUpdateWalletDTO;
 use App\Exceptions\Admin\WalletException;
+use App\Models\Invoice;
 use App\Models\Wallet;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -90,5 +91,46 @@ class WalletServices
         $wallet = $user->wallets()->where('id', $id)->first();
 
         $wallet->delete();
+    }
+
+    /**
+     * Atualiza o saldo da carteira ao pagar ou receber uma invoice
+     * 
+     * Para INCOME (receita):
+     * - Ao pagar: adiciona valor ao saldo (dinheiro entrando)
+     * - Ao desmarcar: subtrai valor do saldo (reverte entrada)
+     * 
+     * Para EXPENSE (despesa):
+     * - Ao pagar: subtrai valor do saldo (dinheiro saindo)
+     * - Ao desmarcar: adiciona valor ao saldo (reverte saída)
+     */
+    public function updateBalanceByInvoice(Invoice $invoice, string $action): void
+    {
+        $wallet = Wallet::where('id', $invoice->wallet_id)
+            ->where('user_id', $invoice->user_id)
+            ->lockForUpdate() // Lock para evitar race conditions
+            ->first();
+
+        if (!$wallet) {
+            throw new WalletException('Carteira não encontrada');
+        }
+
+        if ($action === 'pay') {
+            $this->addBalance($wallet, $invoice->amount);
+        } else {
+            $this->subtractBalance($wallet, $invoice->amount);
+        }
+    }
+
+    private function addBalance(Wallet $wallet, float $amount): void
+    {
+        $wallet->balance += $amount;
+        $wallet->save();
+    }
+
+    private function subtractBalance(Wallet $wallet, float $amount): void
+    {
+        $wallet->balance -= $amount;
+        $wallet->save();
     }
 }

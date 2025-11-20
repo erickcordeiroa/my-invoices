@@ -517,6 +517,811 @@
                 ]
             }
         },
+        "/invoices": {
+            "get": {
+                "tags": [
+                    "Invoices"
+                ],
+                "summary": "Listar invoices",
+                "description": "Retorna todas as invoices do usuário autenticado",
+                "operationId": "297cbdb24fdb2777836948286d79a4f6",
+                "responses": {
+                    "200": {
+                        "description": "Lista de invoices",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "example": "Pagamento de fornecedor"
+                                            },
+                                            "type": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "income",
+                                                    "expense"
+                                                ],
+                                                "example": "expense"
+                                            },
+                                            "amount": {
+                                                "type": "integer",
+                                                "example": 150000
+                                            },
+                                            "status": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "unpaid",
+                                                    "paid",
+                                                    "overdue"
+                                                ],
+                                                "example": "unpaid"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Invoices"
+                ],
+                "summary": "Criar invoice",
+                "description": "Cria uma nova invoice (única, parcelada ou mensal)",
+                "operationId": "eb8b62994899fc6f671b533aa46a74c2",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "wallet_id",
+                                    "category_id",
+                                    "type",
+                                    "amount",
+                                    "due_at"
+                                ],
+                                "properties": {
+                                    "wallet_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "category_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Pagamento de fornecedor"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "income",
+                                            "expense"
+                                        ],
+                                        "example": "expense"
+                                    },
+                                    "amount": {
+                                        "type": "integer",
+                                        "example": 150000
+                                    },
+                                    "currency": {
+                                        "type": "string",
+                                        "example": "BRL"
+                                    },
+                                    "due_at": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-01-31"
+                                    },
+                                    "repeat_when": {
+                                        "type": "string",
+                                        "enum": [
+                                            "monthly"
+                                        ],
+                                        "example": "monthly"
+                                    },
+                                    "period": {
+                                        "type": "string",
+                                        "enum": [
+                                            "monthly"
+                                        ],
+                                        "example": "monthly"
+                                    },
+                                    "enrollments": {
+                                        "type": "integer",
+                                        "example": 3
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Invoice criada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "description": {
+                                            "type": "string",
+                                            "example": "Pagamento de fornecedor"
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "enum": [
+                                                "income",
+                                                "expense"
+                                            ],
+                                            "example": "expense"
+                                        },
+                                        "amount": {
+                                            "type": "integer",
+                                            "example": 150000
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro ao criar invoice",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Carteira não encontrada ou não pertence ao usuário"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "422": {
+                        "description": "Dados de validação inválidos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Dados inválidos"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/invoices/search": {
+            "get": {
+                "tags": [
+                    "Invoices"
+                ],
+                "summary": "Buscar invoices",
+                "description": "Busca invoices com filtros diversos",
+                "operationId": "960ad80ecd1f3c93e75ee955751e556f",
+                "parameters": [
+                    {
+                        "name": "description",
+                        "in": "query",
+                        "description": "Descrição da invoice (busca parcial)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "Fornecedor"
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Tipo da invoice",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "income",
+                                "expense"
+                            ],
+                            "example": "expense"
+                        }
+                    },
+                    {
+                        "name": "wallet_id",
+                        "in": "query",
+                        "description": "ID da carteira",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "category_id",
+                        "in": "query",
+                        "description": "ID da categoria",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Status da invoice",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "unpaid",
+                                "paid",
+                                "overdue"
+                            ],
+                            "example": "unpaid"
+                        }
+                    },
+                    {
+                        "name": "date_from",
+                        "in": "query",
+                        "description": "Data inicial (Y-m-d)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2025-01-01"
+                        }
+                    },
+                    {
+                        "name": "date_to",
+                        "in": "query",
+                        "description": "Data final (Y-m-d)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2025-12-31"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de invoices encontradas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "example": "Pagamento de fornecedor"
+                                            },
+                                            "type": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "income",
+                                                    "expense"
+                                                ],
+                                                "example": "expense"
+                                            },
+                                            "amount": {
+                                                "type": "integer",
+                                                "example": 150000
+                                            },
+                                            "status": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "unpaid",
+                                                    "paid",
+                                                    "overdue"
+                                                ],
+                                                "example": "unpaid"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Dados de validação inválidos ou nenhuma invoice encontrada"
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/invoices/{id}": {
+            "get": {
+                "tags": [
+                    "Invoices"
+                ],
+                "summary": "Obter invoice",
+                "description": "Retorna os detalhes de uma invoice específica",
+                "operationId": "83a85c4db9830538fdfa324eec328c0c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID da invoice",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalhes da invoice",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "description": {
+                                            "type": "string",
+                                            "example": "Pagamento de fornecedor"
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "enum": [
+                                                "income",
+                                                "expense"
+                                            ],
+                                            "example": "expense"
+                                        },
+                                        "amount": {
+                                            "type": "integer",
+                                            "example": 150000
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "enum": [
+                                                "unpaid",
+                                                "paid",
+                                                "overdue"
+                                            ],
+                                            "example": "unpaid"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "404": {
+                        "description": "Invoice não encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Invoices"
+                ],
+                "summary": "Atualizar invoice",
+                "description": "Atualiza uma invoice existente",
+                "operationId": "20b6ba59ea4d6033de60635f7be85089",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID da invoice",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "wallet_id",
+                                    "category_id",
+                                    "type",
+                                    "amount",
+                                    "due_at"
+                                ],
+                                "properties": {
+                                    "wallet_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "category_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Pagamento de fornecedor"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "income",
+                                            "expense"
+                                        ],
+                                        "example": "expense"
+                                    },
+                                    "amount": {
+                                        "type": "integer",
+                                        "example": 150000
+                                    },
+                                    "currency": {
+                                        "type": "string",
+                                        "example": "BRL"
+                                    },
+                                    "due_at": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-01-31"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Invoice atualizada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "description": {
+                                            "type": "string",
+                                            "example": "Pagamento de fornecedor"
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "enum": [
+                                                "income",
+                                                "expense"
+                                            ],
+                                            "example": "expense"
+                                        },
+                                        "amount": {
+                                            "type": "integer",
+                                            "example": 150000
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro ao atualizar invoice",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invoice não encontrada"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "404": {
+                        "description": "Invoice não encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invoice não encontrada"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Dados de validação inválidos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Dados inválidos"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Invoices"
+                ],
+                "summary": "Excluir invoice",
+                "description": "Exclui uma invoice. Não é possível excluir invoices parceladas ou com parcelas relacionadas.",
+                "operationId": "6b167b39f549c32a7588ecc39c33d36f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID da invoice",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Invoice excluída com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invoice deletada com sucesso"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro ao excluir invoice"
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "404": {
+                        "description": "Invoice não encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/invoices/{id}/pay": {
+            "post": {
+                "tags": [
+                    "Invoices"
+                ],
+                "summary": "Marcar invoice como paga",
+                "description": "Marca uma invoice como paga e atualiza o saldo da carteira",
+                "operationId": "b135261aa5df559fefac3e4e213cee04",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID da invoice",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "paid_at": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-01-15"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Invoice marcada como paga",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "enum": [
+                                                "paid"
+                                            ],
+                                            "example": "paid"
+                                        },
+                                        "paid_at": {
+                                            "type": "string",
+                                            "format": "date",
+                                            "example": "2025-01-15"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro ao marcar como paga (ex: já está paga)"
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "404": {
+                        "description": "Invoice não encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/invoices/{id}/unpay": {
+            "post": {
+                "tags": [
+                    "Invoices"
+                ],
+                "summary": "Marcar invoice como não paga",
+                "description": "Marca uma invoice como não paga e reverte o saldo da carteira",
+                "operationId": "6c7265887a6443367d9b4f89240206e1",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID da invoice",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Invoice marcada como não paga",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "enum": [
+                                                "unpaid",
+                                                "overdue"
+                                            ],
+                                            "example": "unpaid"
+                                        },
+                                        "paid_at": {
+                                            "type": "null",
+                                            "example": null
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro ao marcar como não paga (ex: não está paga)"
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "404": {
+                        "description": "Invoice não encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/wallets": {
             "get": {
                 "tags": [
@@ -1440,6 +2245,10 @@
         {
             "name": "Categorias",
             "description": "Endpoints para gerenciamento de categorias de receitas e despesas"
+        },
+        {
+            "name": "Invoices",
+            "description": "Endpoints para gerenciamento de faturas (contas a pagar e receber)"
         },
         {
             "name": "Carteiras",

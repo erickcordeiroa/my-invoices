@@ -76,6 +76,11 @@ class User extends Authenticatable
         return $this->hasMany(Wallet::class);
     }
 
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
     /**
      * Verifica se o usuário está ativo
      */

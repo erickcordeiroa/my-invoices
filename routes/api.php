@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\InvoiceController;
 use App\Http\Controllers\Admin\WalletController;
 use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
@@ -21,7 +22,13 @@ Route::group(['prefix' => 'v1'], function () {
         Route::get('/wallets/search', [WalletController::class, 'search']);
         Route::resource('/wallets', WalletController::class)->only(['index', 'show','store', 'update', 'destroy']);
 
-        //TODO: Add routes for invoices and user profile
+        /** Invoices */
+        Route::get('/invoices/search', [InvoiceController::class, 'search']);
+        Route::post('/invoices/{invoice}/pay', [InvoiceController::class, 'pay']);
+        Route::post('/invoices/{invoice}/unpay', [InvoiceController::class, 'unpay']);
+        Route::resource('/invoices', InvoiceController::class)->only(['index', 'show','store', 'update', 'destroy']);
+
+        //TODO: Add routes for user profile
 
         Route::post('/logout', [AuthController::class, 'logout']);
     });
