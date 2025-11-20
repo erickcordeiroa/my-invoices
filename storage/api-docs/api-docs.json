@@ -517,6 +517,460 @@
                 ]
             }
         },
+        "/wallets": {
+            "get": {
+                "tags": [
+                    "Carteiras"
+                ],
+                "summary": "Listar carteiras",
+                "description": "Retorna todas as carteiras do usuário autenticado",
+                "operationId": "7fd92064072ba61a6a3aa97bc569d1e5",
+                "responses": {
+                    "200": {
+                        "description": "Lista de carteiras",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Carteira Principal"
+                                            },
+                                            "balance": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 1500.5
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Carteiras"
+                ],
+                "summary": "Criar carteira",
+                "description": "Cria uma nova carteira para o usuário autenticado",
+                "operationId": "82f84520e4bcebff13eb9dc0b5e33a07",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Carteira Principal"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Carteira criada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Carteira Principal"
+                                        },
+                                        "balance": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 0
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "example": {
+                                    "id": 1,
+                                    "name": "Carteira Principal",
+                                    "balance": 0
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro ao criar carteira (ex: carteira duplicada)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Já existe uma carteira com este nome"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "422": {
+                        "description": "Dados de validação inválidos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Dados inválidos"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/wallets/search": {
+            "get": {
+                "tags": [
+                    "Carteiras"
+                ],
+                "summary": "Buscar carteiras",
+                "description": "Busca carteiras por nome",
+                "operationId": "deaf3364ff77afe9214b57c5e5925960",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "Nome da carteira (busca parcial)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "Principal"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de carteiras encontradas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Carteira Principal"
+                                            },
+                                            "balance": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 1500.5
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Dados de validação inválidos"
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/wallets/{id}": {
+            "get": {
+                "tags": [
+                    "Carteiras"
+                ],
+                "summary": "Obter carteira",
+                "description": "Retorna os detalhes de uma carteira específica",
+                "operationId": "5e3d1b7ca564d50cab0ebf53e35d149b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID da carteira",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalhes da carteira",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Carteira Principal"
+                                        },
+                                        "balance": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 1500.5
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "404": {
+                        "description": "Carteira não encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Carteiras"
+                ],
+                "summary": "Atualizar carteira",
+                "description": "Atualiza uma carteira existente",
+                "operationId": "ed5249470c8a0d8b61d29b8d78280d9d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID da carteira",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Carteira Principal"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "example": {
+                                "name": "Carteira Principal"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Carteira atualizada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Carteira Principal"
+                                        },
+                                        "balance": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 1500.5
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "example": {
+                                    "id": 1,
+                                    "name": "Carteira Principal",
+                                    "balance": 1500.5
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro ao atualizar carteira",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Já existe uma carteira com este nome"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "404": {
+                        "description": "Carteira não encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Carteira não encontrada"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Dados de validação inválidos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Dados inválidos"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Carteiras"
+                ],
+                "summary": "Excluir carteira",
+                "description": "Exclui uma carteira. Não é possível excluir carteiras com movimentações vinculadas.",
+                "operationId": "8199e76fa624539ebff53af3a110a2f8",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID da carteira",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Carteira excluída com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Carteira deletada com sucesso"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro ao excluir carteira (ex: possui movimentações vinculadas)"
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "404": {
+                        "description": "Carteira não encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/login": {
             "post": {
                 "tags": [
@@ -986,6 +1440,10 @@
         {
             "name": "Categorias",
             "description": "Endpoints para gerenciamento de categorias de receitas e despesas"
+        },
+        {
+            "name": "Carteiras",
+            "description": "Endpoints para gerenciamento de carteiras"
         },
         {
             "name": "Autenticação",
