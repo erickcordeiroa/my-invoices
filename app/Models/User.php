@@ -81,6 +81,11 @@ class User extends Authenticatable
         return $this->hasMany(Invoice::class);
     }
 
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
+    }
+
     /**
      * Verifica se o usuário está ativo
      */

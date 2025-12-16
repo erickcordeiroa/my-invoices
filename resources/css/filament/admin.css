@@ -1,0 +1,265 @@
+/* My Invoices - Custom Filament Theme */
+
+/* Google Font Import */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+    /* Primary brand colors */
+    --primary-50: 236 253 245;
+    --primary-100: 209 250 229;
+    --primary-200: 167 243 208;
+    --primary-300: 110 231 183;
+    --primary-400: 52 211 153;
+    --primary-500: 16 185 129;
+    --primary-600: 5 150 105;
+    --primary-700: 4 120 87;
+    --primary-800: 6 95 70;
+    --primary-900: 6 78 59;
+    --primary-950: 2 44 34;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgb(var(--gray-100));
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgb(var(--primary-400));
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--primary-500));
+}
+
+.dark ::-webkit-scrollbar-track {
+    background: rgb(var(--gray-800));
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: rgb(var(--primary-600));
+}
+
+/* Sidebar improvements */
+.fi-sidebar {
+    background: linear-gradient(180deg, rgb(var(--gray-50)) 0%, rgb(var(--gray-100)) 100%);
+}
+
+.dark .fi-sidebar {
+    background: linear-gradient(180deg, rgb(var(--gray-900)) 0%, rgb(var(--gray-950)) 100%);
+}
+
+/* Navigation item hover effects */
+.fi-sidebar-item-button {
+    transition: all 0.2s ease-in-out;
+}
+
+.fi-sidebar-item-button:hover {
+    transform: translateX(4px);
+}
+
+/* Card improvements */
+.fi-section {
+    border-radius: 1rem !important;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    transition: all 0.3s ease;
+}
+
+.fi-section:hover {
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* Stats widget improvements */
+.fi-wi-stats-overview-stat {
+    border-radius: 1rem !important;
+    transition: all 0.3s ease;
+}
+
+.fi-wi-stats-overview-stat:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+/* Table improvements */
+.fi-ta-table {
+    border-radius: 1rem !important;
+    overflow: hidden;
+}
+
+.fi-ta-row {
+    transition: all 0.2s ease;
+}
+
+.fi-ta-row:hover {
+    background-color: rgb(var(--primary-50)) !important;
+}
+
+.dark .fi-ta-row:hover {
+    background-color: rgb(var(--gray-800)) !important;
+}
+
+/* Badge improvements */
+.fi-badge {
+    font-weight: 500;
+    letter-spacing: 0.025em;
+}
+
+/* Button improvements */
+.fi-btn {
+    border-radius: 0.75rem !important;
+    transition: all 0.2s ease;
+}
+
+.fi-btn:hover {
+    transform: translateY(-1px);
+}
+
+.fi-btn:active {
+    transform: translateY(0);
+}
+
+/* Form input improvements */
+.fi-input,
+.fi-select {
+    border-radius: 0.75rem !important;
+    transition: all 0.2s ease;
+}
+
+.fi-input:focus,
+.fi-select:focus {
+    box-shadow: 0 0 0 3px rgb(var(--primary-200));
+}
+
+.dark .fi-input:focus,
+.dark .fi-select:focus {
+    box-shadow: 0 0 0 3px rgb(var(--primary-800));
+}
+
+/* Modal improvements */
+.fi-modal-window {
+    border-radius: 1.5rem !important;
+}
+
+/* Header improvements */
+.fi-header {
+    padding: 1.5rem 0;
+}
+
+.fi-header-heading {
+    font-weight: 700 !important;
+}
+
+/* Login page improvements */
+.fi-simple-main {
+    background: linear-gradient(135deg, rgb(var(--primary-500)) 0%, rgb(var(--primary-700)) 100%);
+}
+
+.fi-simple-main::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.5;
+    z-index: 0;
+}
+
+.fi-simple-page {
+    position: relative;
+    z-index: 1;
+}
+
+/* Chart widget improvements */
+.fi-wi-chart {
+    border-radius: 1rem !important;
+}
+
+/* Action buttons group */
+.fi-ac-action {
+    border-radius: 0.5rem !important;
+}
+
+/* Notification improvements */
+.fi-notification {
+    border-radius: 1rem !important;
+    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+}
+
+/* Tab improvements */
+.fi-tabs-tab {
+    border-radius: 0.75rem !important;
+    transition: all 0.2s ease;
+}
+
+/* Empty state improvements */
+.fi-ta-empty-state {
+    padding: 4rem 2rem;
+}
+
+.fi-ta-empty-state-icon {
+    opacity: 0.3;
+}
+
+/* Animation keyframes */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fi-page {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .fi-wi-stats-overview-stat {
+        margin-bottom: 1rem;
+    }
+    
+    .fi-section {
+        border-radius: 0.75rem !important;
+    }
+}
+
+/* Toggle buttons improvements */
+.fi-fo-toggle-buttons {
+    gap: 0.5rem;
+}
+
+.fi-fo-toggle-buttons button {
+    border-radius: 0.75rem !important;
+    transition: all 0.2s ease;
+}
+
+/* Date picker improvements */
+.fi-fo-date-time-picker-calendar {
+    border-radius: 1rem !important;
+}
+
+/* Breadcrumb improvements */
+.fi-breadcrumbs {
+    font-size: 0.875rem;
+}
+
+.fi-breadcrumbs-item {
+    transition: all 0.2s ease;
+}
+
+.fi-breadcrumbs-item:hover {
+    color: rgb(var(--primary-500));
+}
+
