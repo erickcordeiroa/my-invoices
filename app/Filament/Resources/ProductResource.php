@@ -38,7 +38,7 @@ class ProductResource extends Resource
             ->schema([
                 Forms\Components\Tabs::make('Produto')
                     ->tabs([
-                        // Tab 1: Informações Básicas
+                        // Tab 1: Informações
                         Forms\Components\Tabs\Tab::make('Informações')
                             ->icon('heroicon-o-information-circle')
                             ->schema([
@@ -92,15 +92,7 @@ class ProductResource extends Resource
                                                     ->columnSpanFull(),
                                             ])
                                             ->columns(4),
-                                    ]),
-                            ]),
 
-                        // Tab 2: Preços e Estoque
-                        Forms\Components\Tabs\Tab::make('Preços e Estoque')
-                            ->icon('heroicon-o-currency-dollar')
-                            ->schema([
-                                Forms\Components\Grid::make()
-                                    ->schema([
                                         Forms\Components\Section::make('Preços')
                                             ->description('Valores do produto')
                                             ->icon('heroicon-o-banknotes')
@@ -145,9 +137,42 @@ class ProductResource extends Resource
                                                     ->placeholder('0,00')
                                                     ->helperText('Para calcular margem de lucro'),
                                             ])
-                                            ->columns(2)
-                                            ->columnSpan(1),
+                                            ->columns(2),
 
+                                        Forms\Components\Section::make('Galeria de Imagens')
+                                            ->description('Adicione até 5 imagens do produto')
+                                            ->icon('heroicon-o-photo')
+                                            ->schema([
+                                                Forms\Components\FileUpload::make('images')
+                                                    ->label('Imagens do Produto')
+                                                    ->image()
+                                                    ->multiple()
+                                                    ->reorderable()
+                                                    ->appendFiles()
+                                                    ->maxFiles(5)
+                                                    ->disk('public')
+                                                    ->directory(fn () => 'usuarios/' . auth()->id() . '/produtos')
+                                                    ->visibility('public')
+                                                    ->imageEditor()
+                                                    ->imageEditorAspectRatios([
+                                                        '1:1',
+                                                        '4:3',
+                                                        '16:9',
+                                                    ])
+                                                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                                    ->maxSize(2048)
+                                                    ->helperText('Formatos aceitos: JPG, PNG, WebP. Tamanho máximo: 2MB por imagem.')
+                                                    ->columnSpanFull(),
+                                            ]),
+                                    ]),
+                            ]),
+
+                        // Tab 2: Configurações
+                        Forms\Components\Tabs\Tab::make('Configurações')
+                            ->icon('heroicon-o-cog-6-tooth')
+                            ->schema([
+                                Forms\Components\Grid::make()
+                                    ->schema([
                                         Forms\Components\Section::make('Estoque')
                                             ->description('Controle de inventário')
                                             ->icon('heroicon-o-archive-box')
@@ -157,13 +182,16 @@ class ProductResource extends Resource
                                                     ->numeric()
                                                     ->default(0)
                                                     ->minValue(0)
-                                                    ->required(),
+                                                    ->required(fn (Get $get): bool => !$get('has_variations'))
+                                                    ->visible(fn (Get $get): bool => !$get('has_variations'))
+                                                    ->helperText('Quantidade disponível em estoque'),
 
                                                 Forms\Components\TextInput::make('min_stock')
                                                     ->label('Estoque Mínimo')
                                                     ->numeric()
                                                     ->default(0)
                                                     ->minValue(0)
+                                                    ->visible(fn (Get $get): bool => !$get('has_variations'))
                                                     ->helperText('Alerta quando atingir'),
 
                                                 Forms\Components\Select::make('unit')
@@ -182,80 +210,67 @@ class ProductResource extends Resource
                                                         'kit' => 'Kit',
                                                     ])
                                                     ->default('un')
-                                                    ->required()
+                                                    ->required(fn (Get $get): bool => !$get('has_variations'))
+                                                    ->visible(fn (Get $get): bool => !$get('has_variations'))
                                                     ->native(false)
+                                                    ->helperText('Unidade de medida do produto'),
+
+                                                Forms\Components\Placeholder::make('variations_stock_info')
+                                                    ->label('')
+                                                    ->content('O estoque, unidade de medida e cor deste produto são gerenciados através das variações. Acesse a aba "Variações" para controlar cada variação.')
+                                                    ->visible(fn (Get $get): bool => $get('has_variations'))
+                                                    ->columnSpanFull(),
+                                            ])
+                                            ->columns(2)
+                                            ->columnSpan(1),
+
+                                        Forms\Components\Section::make('Configurações do Produto')
+                                            ->description('Status e características')
+                                            ->icon('heroicon-o-tag')
+                                            ->schema([
+                                                Forms\Components\TextInput::make('brand')
+                                                    ->label('Marca')
+                                                    ->maxLength(100)
+                                                    ->placeholder('Ex: Nike, Apple, Samsung...')
+                                                    ->datalist(fn () => Product::where('user_id', auth()->id())
+                                                        ->whereNotNull('brand')
+                                                        ->distinct()
+                                                        ->pluck('brand')
+                                                        ->toArray()
+                                                    )
+                                                    ->columnSpanFull(),
+
+                                                Forms\Components\ColorPicker::make('color')
+                                                    ->label('Cor Principal')
+                                                    ->visible(fn (Get $get): bool => !$get('has_variations'))
+                                                    ->helperText('A cor é gerenciada pelas variações quando o produto possui variações'),
+
+                                                Forms\Components\Toggle::make('is_active')
+                                                    ->label('Produto Ativo')
+                                                    ->default(true)
+                                                    ->helperText('Produtos inativos não aparecem para venda')
+                                                    ->inline(false)
+                                                    ->columnSpanFull(),
+
+                                                Forms\Components\Toggle::make('has_variations')
+                                                    ->label('Possui Variações')
+                                                    ->default(false)
+                                                    ->helperText('Ative para cadastrar variações de cor, tamanho, etc.')
+                                                    ->inline(false)
+                                                    ->live()
+                                                    ->afterStateUpdated(function (Set $set, $state) {
+                                                        if ($state) {
+                                                            // Quando ativa variações, zera o estoque do produto principal
+                                                            $set('stock', 0);
+                                                            $set('min_stock', 0);
+                                                        }
+                                                    })
                                                     ->columnSpanFull(),
                                             ])
                                             ->columns(2)
                                             ->columnSpan(1),
                                     ])
                                     ->columns(2),
-                            ]),
-
-                        // Tab 3: Atributos
-                        Forms\Components\Tabs\Tab::make('Atributos')
-                            ->icon('heroicon-o-tag')
-                            ->schema([
-                                Forms\Components\Section::make('Características')
-                                    ->description('Atributos e características do produto')
-                                    ->schema([
-                                        Forms\Components\TextInput::make('brand')
-                                            ->label('Marca')
-                                            ->maxLength(100)
-                                            ->placeholder('Ex: Nike, Apple, Samsung...')
-                                            ->datalist(fn () => Product::where('user_id', auth()->id())
-                                                ->whereNotNull('brand')
-                                                ->distinct()
-                                                ->pluck('brand')
-                                                ->toArray()
-                                            ),
-
-                                        Forms\Components\ColorPicker::make('color')
-                                            ->label('Cor Principal'),
-
-                                        Forms\Components\Toggle::make('is_active')
-                                            ->label('Produto Ativo')
-                                            ->default(true)
-                                            ->helperText('Produtos inativos não aparecem para venda')
-                                            ->inline(false),
-
-                                        Forms\Components\Toggle::make('has_variations')
-                                            ->label('Possui Variações')
-                                            ->default(false)
-                                            ->helperText('Ative para cadastrar variações de cor, tamanho, etc.')
-                                            ->inline(false),
-                                    ])
-                                    ->columns(2),
-                            ]),
-
-                        // Tab 4: Imagens
-                        Forms\Components\Tabs\Tab::make('Imagens')
-                            ->icon('heroicon-o-photo')
-                            ->schema([
-                                Forms\Components\Section::make('Galeria de Imagens')
-                                    ->description('Adicione até 5 imagens do produto')
-                                    ->schema([
-                                        Forms\Components\FileUpload::make('images')
-                                            ->label('Imagens do Produto')
-                                            ->image()
-                                            ->multiple()
-                                            ->reorderable()
-                                            ->appendFiles()
-                                            ->maxFiles(5)
-                                            ->disk('public')
-                                            ->directory(fn () => 'usuarios/' . auth()->id() . '/produtos')
-                                            ->visibility('public')
-                                            ->imageEditor()
-                                            ->imageEditorAspectRatios([
-                                                '1:1',
-                                                '4:3',
-                                                '16:9',
-                                            ])
-                                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                                            ->maxSize(2048)
-                                            ->helperText('Formatos aceitos: JPG, PNG, WebP. Tamanho máximo: 2MB por imagem.')
-                                            ->columnSpanFull(),
-                                    ]),
                             ]),
                     ])
                     ->columnSpanFull()
@@ -292,7 +307,7 @@ class ProductResource extends Resource
                     ->sortable()
                     ->weight(FontWeight::Bold)
                     ->limit(30)
-                    ->tooltip(fn (Product $record): string => $record->title),
+                    ->tooltip(fn (?Product $record): string => $record?->title ?? ''),
 
                 Tables\Columns\TextColumn::make('brand')
                     ->label('Marca')
@@ -304,7 +319,8 @@ class ProductResource extends Resource
 
                 Tables\Columns\ColorColumn::make('color')
                     ->label('Cor')
-                    ->toggleable(),
+                    ->toggleable()
+                    ->visible(fn (?Product $record): bool => $record ? !$record->has_variations : true),
 
                 Tables\Columns\TextColumn::make('price')
                     ->label('Preço')
@@ -317,17 +333,30 @@ class ProductResource extends Resource
                     ->label('Estoque')
                     ->sortable()
                     ->badge()
-                    ->color(fn (Product $record): string => 
-                        $record->stock <= 0 ? 'danger' : 
-                        ($record->stock <= $record->min_stock ? 'warning' : 'success')
-                    )
-                    ->icon(fn (Product $record): string => 
-                        $record->stock <= 0 ? 'heroicon-o-x-circle' : 
-                        ($record->stock <= $record->min_stock ? 'heroicon-o-exclamation-triangle' : 'heroicon-o-check-circle')
-                    )
-                    ->formatStateUsing(fn (Product $record): string => 
-                        $record->stock . ' ' . $record->unit
-                    ),
+                    ->color(function (?Product $record): string {
+                        if (!$record) return 'gray';
+                        if ($record->has_variations) {
+                            return 'info';
+                        }
+                        return $record->stock <= 0 ? 'danger' : 
+                            ($record->stock <= $record->min_stock ? 'warning' : 'success');
+                    })
+                    ->icon(function (?Product $record): string {
+                        if (!$record) return 'heroicon-o-question-mark-circle';
+                        if ($record->has_variations) {
+                            return 'heroicon-o-squares-2x2';
+                        }
+                        return $record->stock <= 0 ? 'heroicon-o-x-circle' : 
+                            ($record->stock <= $record->min_stock ? 'heroicon-o-exclamation-triangle' : 'heroicon-o-check-circle');
+                    })
+                    ->formatStateUsing(function (?Product $record): string {
+                        if (!$record) return '0';
+                        if ($record->has_variations) {
+                            $totalStock = $record->variations()->sum('stock');
+                            return "Total: {$totalStock} (por variações)";
+                        }
+                        return $record->stock . ' ' . $record->unit;
+                    }),
 
                 Tables\Columns\TextColumn::make('min_stock')
                     ->label('Mín.')
@@ -392,7 +421,8 @@ class ProductResource extends Resource
                     ->icon('heroicon-o-archive-box-arrow-down')
                     ->color('warning')
                     ->modalHeading('Ajustar Estoque')
-                    ->modalDescription(fn (Product $record): string => "Ajustar estoque de: {$record->title}")
+                    ->modalDescription(fn (?Product $record): string => $record ? "Ajustar estoque de: {$record->title}" : "Ajustar Estoque")
+                    ->visible(fn (?Product $record): bool => $record ? !$record->has_variations : false)
                     ->form([
                         Forms\Components\Select::make('operation')
                             ->label('Operação')
@@ -445,9 +475,9 @@ class ProductResource extends Resource
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\Action::make('toggle_active')
-                        ->label(fn (Product $record): string => $record->is_active ? 'Desativar' : 'Ativar')
-                        ->icon(fn (Product $record): string => $record->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
-                        ->color(fn (Product $record): string => $record->is_active ? 'danger' : 'success')
+                        ->label(fn (?Product $record): string => $record && $record->is_active ? 'Desativar' : 'Ativar')
+                        ->icon(fn (?Product $record): string => $record && $record->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
+                        ->color(fn (?Product $record): string => $record && $record->is_active ? 'danger' : 'success')
                         ->requiresConfirmation()
                         ->action(function (Product $record): void {
                             $record->is_active = !$record->is_active;

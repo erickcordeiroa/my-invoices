@@ -21,6 +21,11 @@ class VariationsRelationManager extends RelationManager
 
     protected static ?string $pluralModelLabel = 'Variações';
 
+    public static function canViewForRecord($ownerRecord, string $pageClass): bool
+    {
+        return $ownerRecord->has_variations ?? false;
+    }
+
     public function form(Form $form): Form
     {
         return $form
@@ -88,21 +93,6 @@ class VariationsRelationManager extends RelationManager
                             ->label('Ativo')
                             ->default(true)
                             ->columnSpanFull(),
-
-                        Forms\Components\FileUpload::make('images')
-                            ->label('Imagens da Variação')
-                            ->image()
-                            ->multiple()
-                            ->reorderable()
-                            ->appendFiles()
-                            ->maxFiles(3)
-                            ->disk('public')
-                            ->directory(fn () => 'usuarios/' . auth()->id() . '/variacoes')
-                            ->visibility('public')
-                            ->imageEditor()
-                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                            ->maxSize(2048)
-                            ->columnSpanFull(),
                     ])
                     ->columns(4),
             ]);
@@ -113,13 +103,6 @@ class VariationsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('name')
             ->columns([
-                Tables\Columns\ImageColumn::make('images')
-                    ->label('Foto')
-                    ->circular()
-                    ->stacked()
-                    ->limit(1)
-                    ->disk('public'),
-
                 Tables\Columns\TextColumn::make('sku')
                     ->label('SKU')
                     ->searchable()
